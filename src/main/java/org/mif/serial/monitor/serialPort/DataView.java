@@ -1,11 +1,13 @@
 package org.mif.serial.monitor.serialPort;
 
-import com.sun.deploy.util.StringUtils;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.mif.serial.monitor.serialException.*;
+import lombok.extern.slf4j.Slf4j;
+import org.mif.serial.monitor.serialException.ExceptionWriter;
+import org.mif.serial.monitor.serialException.ReadDataFromSerialPortFailure;
+import org.mif.serial.monitor.serialException.SerialPortInputStreamCloseFailure;
+import org.mif.serial.monitor.vo.EquipmentVO;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,6 +22,7 @@ import java.util.List;
  *
  * @author Zhong
  */
+@Slf4j
 public class DataView extends Frame {
 
     /**
@@ -29,9 +32,9 @@ public class DataView extends Frame {
 
     Client client = null;
 
-    private List<String> pclList = null; //PLC列表
+    private List<EquipmentVO> pclList; //PLC列表
 
-    private List<String> commList = null;    //保存可用端口号
+    private List<String> commList;    //保存可用端口号
     private SerialPort serialPort = null;    //保存串口对象
 
 
@@ -39,12 +42,12 @@ public class DataView extends Frame {
 
     private Font font = new Font("微软雅黑", Font.BOLD, 25);
 
-    private Label tem = new Label("暂无数据", Label.CENTER);    //温度
-    private Label hum = new Label("暂无数据", Label.CENTER);    //湿度
-    private Label pa = new Label("暂无数据", Label.CENTER);    //压强
-    private Label rain = new Label("暂无数据", Label.CENTER);    //雨量
-    private Label win_sp = new Label("暂无数据", Label.CENTER);    //风速
-    private Label win_dir = new Label("暂无数据", Label.CENTER);    //风向
+    private Label samplingPeriod = new Label("暂无数据", Label.CENTER);    //采样周期
+    private Label baudRate = new Label("暂无数据", Label.CENTER);    //波特率
+    private Label equipmentLength = new Label("暂无数据", Label.CENTER);    //长度
+    private Label parityBit = new Label("暂无数据", Label.CENTER);    //检验位
+    private Label stopBit = new Label("暂无数据", Label.CENTER);    //停止位
+    private Label linkedMethod = new Label("暂无数据", Label.CENTER);    //链接方式
 
     private Choice commChoice = new Choice();    //串口选择（下拉框）
     private Choice bpsChoice = new Choice();    //波特率选择
@@ -93,48 +96,74 @@ public class DataView extends Frame {
 
         //添加plc选择选项
         plcChoice.setBounds(160, 67, 200, 200);
-//        plcChoice.add("001");
         add(plcChoice);
         if (null != pclList) {
-            pclList.forEach(pa-> plcChoice.add(pa));
-            add(plcChoice);
+
+            for (int i = 0; i < pclList.size(); i++) {
+                EquipmentVO equipmentVO = pclList.get(i);
+                plcChoice.add(equipmentVO.getEquipmentNo());
+                if (i == 0) {
+                    samplingPeriod.setText(equipmentVO.getSamplingPeriod());
+                    baudRate.setText(equipmentVO.getBaudRate());
+                    equipmentLength.setText(equipmentVO.getEquipmentLength());
+                    parityBit.setText(equipmentVO.getParityBit());
+                    stopBit.setText(equipmentVO.getStopBit());
+                    linkedMethod.setText(equipmentVO.getLinkedMethod());
+                }
+            }
+
+        } else {
+            plcChoice.add("--暂无PLC--");
         }
+        add(plcChoice);
 
-        tem.setBounds(140, 103, 225, 50);
-        tem.setBackground(Color.black);
-        tem.setFont(font);
-        tem.setForeground(Color.white);
-        add(tem);
+        //下拉事件监听
+        plcChoice.addItemListener(e -> {
+            String equipNO = (String) e.getItem();
+            HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
+            EquipmentVO vo = httpClientUtils.getPlcDetail(equipNO);
+            if (null == vo) {
+                JOptionPane.showMessageDialog(null, "没有获取到PLC数据！", "错误", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            samplingPeriod.setText(vo.getSamplingPeriod());
+            baudRate.setText(vo.getBaudRate());
+            equipmentLength.setText(vo.getEquipmentLength());
+            parityBit.setText(vo.getParityBit());
+            stopBit.setText(vo.getStopBit());
+            linkedMethod.setText(vo.getLinkedMethod());
+        });
 
-        hum.setBounds(520, 103, 225, 50);
-        hum.setBackground(Color.black);
-        hum.setFont(font);
-        hum.setForeground(Color.white);
-        add(hum);
 
-        pa.setBounds(140, 193, 225, 50);
-        pa.setBackground(Color.black);
-        pa.setFont(font);
-        pa.setForeground(Color.white);
-        add(pa);
+        samplingPeriod.setBounds(140, 103, 225, 50);
+        samplingPeriod.setFont(font);
+        samplingPeriod.setForeground(Color.black);
+        add(samplingPeriod);
 
-        rain.setBounds(520, 193, 225, 50);
-        rain.setBackground(Color.black);
-        rain.setFont(font);
-        rain.setForeground(Color.white);
-        add(rain);
+        baudRate.setBounds(520, 103, 225, 50);
+        baudRate.setFont(font);
+        baudRate.setForeground(Color.black);
+        add(baudRate);
 
-        win_sp.setBounds(140, 283, 225, 50);
-        win_sp.setBackground(Color.black);
-        win_sp.setFont(font);
-        win_sp.setForeground(Color.white);
-        add(win_sp);
+        equipmentLength.setBounds(140, 193, 225, 50);
+        equipmentLength.setFont(font);
+        equipmentLength.setForeground(Color.black);
+        add(equipmentLength);
 
-        win_dir.setBounds(520, 283, 225, 50);
-        win_dir.setBackground(Color.black);
-        win_dir.setFont(font);
-        win_dir.setForeground(Color.white);
-        add(win_dir);
+        parityBit.setBounds(520, 193, 225, 50);
+        parityBit.setFont(font);
+        parityBit.setForeground(Color.black);
+        add(parityBit);
+
+        stopBit.setBounds(140, 283, 225, 50);
+        stopBit.setFont(font);
+        stopBit.setForeground(Color.black);
+        add(stopBit);
+
+        linkedMethod.setBounds(520, 283, 225, 50);
+        linkedMethod.setFont(font);
+        linkedMethod.setForeground(Color.black);
+        add(linkedMethod);
 
         //添加串口选择选项
         commChoice.setBounds(160, 397, 200, 200);
@@ -147,17 +176,6 @@ public class DataView extends Frame {
             }
         }
         add(commChoice);
-
-        //添加波特率选项
-        bpsChoice.setBounds(526, 396, 200, 200);
-        bpsChoice.add("1200");
-        bpsChoice.add("2400");
-        bpsChoice.add("4800");
-        bpsChoice.add("9600");
-        bpsChoice.add("14400");
-        bpsChoice.add("19200");
-        bpsChoice.add("115200");
-        add(bpsChoice);
 
         //添加打开串口按钮
         openSerialButton.setBounds(250, 490, 300, 50);
@@ -172,33 +190,32 @@ public class DataView extends Frame {
 
                 //获取串口名称
                 String commName = commChoice.getSelectedItem();
-                //获取波特率
-                String bpsStr = bpsChoice.getSelectedItem();
 
                 //检查串口名称是否获取正确
                 if (commName == null || commName.equals("")) {
                     JOptionPane.showMessageDialog(null, "没有搜索到有效串口！", "错误", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     //检查波特率是否获取正确
-                    if (bpsStr == null || bpsStr.equals("")) {
-                        JOptionPane.showMessageDialog(null, "波特率获取错误！", "错误", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        //串口名、波特率均获取正确时
-                        int bps = Integer.parseInt(bpsStr);
-                        try {
+//                    if (bpsStr == null || bpsStr.equals("")) {
+//                        JOptionPane.showMessageDialog(null, "波特率获取错误！", "错误", JOptionPane.INFORMATION_MESSAGE);
+//                    } else {
+                    //串口名、波特率均获取正确时
+                    String bpsStr = baudRate.getText();
+                    int bps = Integer.parseInt(bpsStr);
+                    try {
 
-                            //获取指定端口名及波特率的串口对象
-                            serialPort = SerialTool.openPort(commName, bps);
-                            //在该串口对象上添加监听器
-                            SerialTool.addListener(serialPort, new SerialListener());
-                            //监听成功进行提示
-                            JOptionPane.showMessageDialog(null, "监听成功，稍后将显示监测数据！", "提示", JOptionPane.INFORMATION_MESSAGE);
+                        //获取指定端口名及波特率的串口对象
+                        serialPort = SerialTool.openPort(commName, bps);
+                        //在该串口对象上添加监听器
+                        SerialTool.addListener(serialPort, new SerialListener());
+                        //监听成功进行提示
+                        JOptionPane.showMessageDialog(null, "监听成功，稍后将显示监测数据！", "提示", JOptionPane.INFORMATION_MESSAGE);
 
-                        } catch (Exception e1) {
-                            //发生错误时使用一个Dialog提示具体的错误信息
-                            JOptionPane.showMessageDialog(null, e1, "错误", JOptionPane.INFORMATION_MESSAGE);
-                        }
+                    } catch (Exception e1) {
+                        //发生错误时使用一个Dialog提示具体的错误信息
+                        JOptionPane.showMessageDialog(null, e1, "错误", JOptionPane.INFORMATION_MESSAGE);
                     }
+//                    }
                 }
 
             }
@@ -219,39 +236,35 @@ public class DataView extends Frame {
 
         g.setColor(Color.orange);
         g.setFont(new Font("微软雅黑", Font.BOLD, 20));
-        g.drawString(" PLC编号： ", 45, 80);
+        g.drawString(" PLC编号： ", 50, 80);
 
         g.setColor(Color.black);
         g.setFont(new Font("微软雅黑", Font.BOLD, 25));
-        g.drawString(" 温度： ", 45, 130);
+        g.drawString(" 采样周期： ", 50, 130);
 
         g.setColor(Color.black);
         g.setFont(new Font("微软雅黑", Font.BOLD, 25));
-        g.drawString(" 湿度： ", 425, 130);
+        g.drawString(" 波特率： ", 425, 130);
 
         g.setColor(Color.black);
         g.setFont(new Font("微软雅黑", Font.BOLD, 25));
-        g.drawString(" 压强： ", 45, 220);
+        g.drawString(" 长度： ", 50, 220);
 
         g.setColor(Color.black);
         g.setFont(new Font("微软雅黑", Font.BOLD, 25));
-        g.drawString(" 雨量： ", 425, 220);
+        g.drawString(" 检验位： ", 425, 220);
 
         g.setColor(Color.black);
         g.setFont(new Font("微软雅黑", Font.BOLD, 25));
-        g.drawString(" 风速： ", 45, 310);
+        g.drawString(" 停止位： ", 50, 310);
 
         g.setColor(Color.black);
         g.setFont(new Font("微软雅黑", Font.BOLD, 25));
-        g.drawString(" 风向： ", 425, 310);
+        g.drawString(" 链接方式： ", 425, 310);
 
         g.setColor(Color.gray);
         g.setFont(new Font("微软雅黑", Font.BOLD, 20));
-        g.drawString(" 串口选择： ", 45, 410);
-
-        g.setColor(Color.gray);
-        g.setFont(new Font("微软雅黑", Font.BOLD, 20));
-        g.drawString(" 波特率： ", 425, 410);
+        g.drawString(" 串口选择： ", 50, 410);
 
     }
 
@@ -381,7 +394,7 @@ public class DataView extends Frame {
 
                 case SerialPortEvent.DATA_AVAILABLE: // 1 串口存在可用数据
 
-                    //System.out.println("found data");
+                    log.info("found data");
                     byte[] data = null;
 
                     try {
@@ -389,43 +402,13 @@ public class DataView extends Frame {
                             JOptionPane.showMessageDialog(null, "串口对象为空！监听失败！", "错误", JOptionPane.INFORMATION_MESSAGE);
                         } else {
                             data = SerialTool.readFromPort(serialPort);    //读取数据，存入字节数组
-                            //System.out.println(new String(data));
+                            String dataOriginal = new String(data);
+                            log.info("read data =【{}】", dataOriginal);
 
                             //自定义解析过程
-                            if (data == null || data.length < 1) {    //检查数据是否读取正确
-                                JOptionPane.showMessageDialog(null, "读取数据过程中未获取到有效数据！请检查设备或程序！", "错误", JOptionPane.INFORMATION_MESSAGE);
-                                System.exit(0);
-                            } else {
-                                String dataOriginal = new String(data);    //将字节数组数据转换位为保存了原始数据的字符串
-                                String dataValid = "";    //有效数据（用来保存原始数据字符串去除最开头*号以后的字符串）
-                                String[] elements = null;    //用来保存按空格拆分原始字符串后得到的字符串数组
-                                //解析数据
-                                if (dataOriginal.charAt(0) == '*') {    //当数据的第一个字符是*号时表示数据接收完成，开始解析
-                                    dataValid = dataOriginal.substring(1);
-                                    elements = dataValid.split(" ");
-                                    if (elements == null || elements.length < 1) {    //检查数据是否解析正确
-                                        JOptionPane.showMessageDialog(null, "数据解析过程出错，请检查设备或程序！", "错误", JOptionPane.INFORMATION_MESSAGE);
-                                        System.exit(0);
-                                    } else {
-                                        try {
-                                            //更新界面Label值
-											/*for (int i=0; i<elements.length; i++) {
-												System.out.println(elements[i]);
-											}*/
-                                            //System.out.println("win_dir: " + elements[5]);
-                                            tem.setText(elements[0] + " ℃");
-                                            hum.setText(elements[1] + " %");
-                                            pa.setText(elements[2] + " hPa");
-                                            rain.setText(elements[3] + " mm");
-                                            win_sp.setText(elements[4] + " m/s");
-                                            win_dir.setText(elements[5] + " °");
-                                        } catch (ArrayIndexOutOfBoundsException e) {
-                                            JOptionPane.showMessageDialog(null, "数据解析过程出错，更新界面数据失败！请检查设备或程序！", "错误", JOptionPane.INFORMATION_MESSAGE);
-                                            System.exit(0);
-                                        }
-                                    }
-                                }
-                            }
+                            HttpClientUtils utils = HttpClientUtils.getInstance();
+                            String equipNo = plcChoice.getSelectedItem();
+                            utils.sendTransData(equipNo, dataOriginal);
 
                         }
 

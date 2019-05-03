@@ -12,4 +12,18 @@ public class EquipmentVO  {
 
     private String equipmentNo;
 
+    private String samplingPeriod;
+
+    private String baudRate;
+
+    private String equipmentLength;
+
+    private String parityBit;
+
+    private String stopBit;
+
+    private String linkedMethod;
+
+
+
 }

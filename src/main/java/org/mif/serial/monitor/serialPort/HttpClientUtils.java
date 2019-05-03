@@ -1,19 +1,25 @@
 package org.mif.serial.monitor.serialPort;
 
 
+import com.alibaba.fastjson.JSON;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.mif.serial.monitor.vo.EquipmentVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +30,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class HttpClientUtils {
@@ -34,7 +38,7 @@ public class HttpClientUtils {
 
     private final int DEFAULT_TIMEOUT = 30000;
 
-    private final static String url = "http://localhost:8080/api/plcList";
+    private final static String url = "http://localhost:8080";
 
 
     private static HttpClientUtils ins;
@@ -62,11 +66,6 @@ public class HttpClientUtils {
         return ins;
     }
 
-
-    public List<String> getPlcList() {
-        String result = doPost(url, null, 3000);
-        return new ArrayList<>();
-    }
 
     public String doGetWithJsonResult(String uri) {
         String json = null;
@@ -139,28 +138,6 @@ public class HttpClientUtils {
         return json;
     }
 
-	/*public <T> T doGetWithJsonResult(String uri, Class<T> javaType) {
-		T result = null;
-		log.debug("========= Call [{}] Start ==========", uri);
-		try {
-			HttpGet request = new HttpGet(uri);
-			RequestConfig config = RequestConfig.custom().setConnectionRequestTimeout(timeout)
-					.setConnectTimeout(timeout).setSocketTimeout(timeout).build();
-			request.setConfig(config);
-			HttpResponse response = client.execute(request);
-			log.debug("Response status code: {}", response.getStatusLine().getStatusCode());
-			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-				String json = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-				log.debug("Payload : {}", json);
-				result = JsonUtils.toBean(json, javaType);
-			}
-		} catch (Exception e) {
-			log.error("HttpClient has exception! message: {}", e.getMessage(), e);
-			return null;
-		}
-		log.debug("========= Call [{}] End ==========", uri);
-		return result;
-	}*/
 
     public String doPostWithJsonResult(String uri, Map<String, String> paramMap) {
         String json = null;
@@ -303,10 +280,33 @@ public class HttpClientUtils {
         return doPost(url, jsonStr);
     }
 
-    public String doGetCustom(String url, int timeout) {
-        setTimeout(timeout);
-        return doGetCustom(url);
+
+    public List<EquipmentVO> getPlcList() {
+        String result = doPost(url + "/api/plcList", null, 3000);
+        log.info("result={}", result);
+        List<EquipmentVO> equipmentVOS = JSON.parseArray(result, EquipmentVO.class);
+        if (CollectionUtils.isEmpty(equipmentVOS)) {
+            return null;
+        }
+        return equipmentVOS;
     }
 
+    public EquipmentVO getPlcDetail(String equipNo) {
+        Map map = new HashMap();
+        map.put("equipNo", equipNo);
 
+        String result = doPostWithJsonResult(url + "/api/plcDetail", map);
+        log.info("result={}", result);
+        EquipmentVO equipmentVO = JSON.parseObject(result, EquipmentVO.class);
+        return equipmentVO;
+    }
+
+    public void sendTransData(String equipNo, String dataOriginal) {
+        Map map = new HashMap();
+        map.put("equipNo", equipNo);
+        map.put("content", dataOriginal);
+        String result = doPostWithJsonResult(url + "/api/transData", map);
+        log.info("result={}", result);
+
+    }
 }
