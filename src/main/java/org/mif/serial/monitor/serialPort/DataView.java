@@ -4,6 +4,7 @@ import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.mif.serial.monitor.serialException.ExceptionWriter;
 import org.mif.serial.monitor.serialException.ReadDataFromSerialPortFailure;
 import org.mif.serial.monitor.serialException.SerialPortInputStreamCloseFailure;
@@ -78,7 +79,7 @@ public class DataView extends Frame {
      */
     public void dataFrame() {
         this.setBounds(client.LOC_X, client.LOC_Y, client.WIDTH, client.HEIGHT);
-        this.setTitle("服务区监控");
+        this.setTitle("PC辅助软件");
         this.setIconImage(icon);
         this.setBackground(Color.white);
         this.setLayout(null);
@@ -201,6 +202,9 @@ public class DataView extends Frame {
 //                    } else {
                     //串口名、波特率均获取正确时
                     String bpsStr = baudRate.getText();
+                    if (StringUtils.isEmpty(bpsStr)) {
+                        JOptionPane.showMessageDialog(null, "请先完善PLC资料！", "错误", JOptionPane.INFORMATION_MESSAGE);
+                    }
                     int bps = Integer.parseInt(bpsStr);
                     try {
 
