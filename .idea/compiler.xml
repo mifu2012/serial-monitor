@@ -9,6 +9,8 @@
         <module name="serial-monitor" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="8" />
+    <bytecodeTargetLevel>
+      <module name="serial-monitor" target="8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

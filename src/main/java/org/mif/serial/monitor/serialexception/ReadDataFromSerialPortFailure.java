@@ -1,4 +1,4 @@
-package org.mif.serial.monitor.serialException;
+package org.mif.serial.monitor.serialexception;
 
 public class ReadDataFromSerialPortFailure extends Exception {
 	/**

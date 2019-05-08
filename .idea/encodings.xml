@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding" native2AsciiForPropertiesFiles="true">
+  <component name="Encoding" addBOMForNewFiles="with NO BOM">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialException/ExceptionWriter.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialException/NoSuchPort.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialException/NotASerialPort.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialException/PortInUse.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialException/ReadDataFromSerialPortFailure.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialException/SendDataToSerialPortFailure.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialException/SerialPortOutputStreamCloseFailure.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialException/SerialPortParameterFailure.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialException/TooManyListeners.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialPort/Client.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialPort/DataView.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialPort/HttpUtil.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialPort/SerialTool.java" charset="UTF-8" />
-    <file url="PROJECT" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/mif/serial/monitor/serialexception/SerialPortInputStreamCloseFailure.java" charset="UTF-8" />
   </component>
 </project>

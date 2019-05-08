@@ -1,4 +1,4 @@
-package org.mif.serial.monitor.serialException;
+package org.mif.serial.monitor.serialexception;
 
 import java.io.IOException;
 import java.io.PrintWriter;

@@ -1,8 +1,7 @@
-package org.mif.serial.monitor.serialPort;
+package org.mif.serial.monitor.serialport;
 
 import gnu.io.*;
-import lombok.extern.slf4j.Slf4j;
-import org.mif.serial.monitor.serialException.*;
+import org.mif.serial.monitor.serialexception.*;
 
 import java.io.IOException;
 import java.io.InputStream;

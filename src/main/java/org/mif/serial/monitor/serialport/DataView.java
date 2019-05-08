@@ -1,13 +1,13 @@
-package org.mif.serial.monitor.serialPort;
+package org.mif.serial.monitor.serialport;
 
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.mif.serial.monitor.serialException.ExceptionWriter;
-import org.mif.serial.monitor.serialException.ReadDataFromSerialPortFailure;
-import org.mif.serial.monitor.serialException.SerialPortInputStreamCloseFailure;
+import org.mif.serial.monitor.serialexception.ExceptionWriter;
+import org.mif.serial.monitor.serialexception.ReadDataFromSerialPortFailure;
+import org.mif.serial.monitor.serialexception.SerialPortInputStreamCloseFailure;
 import org.mif.serial.monitor.vo.EquipmentVO;
 
 import javax.swing.*;
@@ -68,9 +68,11 @@ public class DataView extends Frame {
      */
     public DataView(Client client) {
         this.client = client;
-        commList = SerialTool.findPort();    //程序初始化时就扫描一次有效串口
+        //程序初始化时就扫描一次有效串口
+        commList = SerialTool.findPort();
         HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
-        pclList = httpClientUtils.getPlcList();    //程序初始化时就扫描一次有效串口
+        //程序初始化时就扫描一次有效串口
+        pclList = httpClientUtils.getPlcList();
     }
 
     /**
@@ -78,13 +80,14 @@ public class DataView extends Frame {
      * 添加Label、按钮、下拉条及相关事件监听；
      */
     public void dataFrame() {
-        this.setBounds(client.LOC_X, client.LOC_Y, client.WIDTH, client.HEIGHT);
+        this.setBounds(Client.LOC_X, Client.LOC_Y, Client.WIDTH, Client.HEIGHT);
         this.setTitle("PC辅助软件");
         this.setIconImage(icon);
         this.setBackground(Color.white);
         this.setLayout(null);
 
         this.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent arg0) {
                 if (serialPort != null) {
                     //程序退出时关闭串口释放资源
@@ -187,6 +190,7 @@ public class DataView extends Frame {
         //添加打开串口按钮的事件监听
         openSerialButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 //获取串口名称
@@ -227,14 +231,15 @@ public class DataView extends Frame {
 
 
         this.setResizable(false);
-
-        new Thread(new RepaintThread()).start();    //启动重画线程
+        //启动重画线程
+        new Thread(new RepaintThread()).start();
 
     }
 
     /**
      * 画出主界面组件元素
      */
+    @Override
     public void paint(Graphics g) {
         Color c = g.getColor();
 
@@ -243,27 +248,27 @@ public class DataView extends Frame {
         g.drawString(" PLC编号： ", 50, 80);
 
         g.setColor(Color.black);
-        g.setFont(new Font("微软雅黑", Font.BOLD, 25));
+        g.setFont(new Font("微软雅黑", Font.BOLD, 20));
         g.drawString(" 采样周期： ", 50, 130);
 
         g.setColor(Color.black);
-        g.setFont(new Font("微软雅黑", Font.BOLD, 25));
+        g.setFont(new Font("微软雅黑", Font.BOLD, 20));
         g.drawString(" 波特率： ", 425, 130);
 
         g.setColor(Color.black);
-        g.setFont(new Font("微软雅黑", Font.BOLD, 25));
+        g.setFont(new Font("微软雅黑", Font.BOLD, 20));
         g.drawString(" 长度： ", 50, 220);
 
         g.setColor(Color.black);
-        g.setFont(new Font("微软雅黑", Font.BOLD, 25));
+        g.setFont(new Font("微软雅黑", Font.BOLD, 20));
         g.drawString(" 检验位： ", 425, 220);
 
         g.setColor(Color.black);
-        g.setFont(new Font("微软雅黑", Font.BOLD, 25));
+        g.setFont(new Font("微软雅黑", Font.BOLD, 20));
         g.drawString(" 停止位： ", 50, 310);
 
         g.setColor(Color.black);
-        g.setFont(new Font("微软雅黑", Font.BOLD, 25));
+        g.setFont(new Font("微软雅黑", Font.BOLD, 20));
         g.drawString(" 链接方式： ", 425, 310);
 
         g.setColor(Color.gray);
@@ -275,21 +280,28 @@ public class DataView extends Frame {
     /**
      * 双缓冲方式重画界面各元素组件
      */
+    @Override
     public void update(Graphics g) {
-        if (offScreen == null) offScreen = this.createImage(Client.WIDTH, Client.HEIGHT);
+        if (offScreen == null) {
+            offScreen = this.createImage(Client.WIDTH, Client.HEIGHT);
+        }
         Graphics gOffScreen = offScreen.getGraphics();
         Color c = gOffScreen.getColor();
         gOffScreen.setColor(Color.white);
-        gOffScreen.fillRect(0, 0, Client.WIDTH, Client.HEIGHT);    //重画背景画布
-        this.paint(gOffScreen);    //重画界面元素
+        //重画背景画布
+        gOffScreen.fillRect(0, 0, Client.WIDTH, Client.HEIGHT);
+        //重画界面元素
+        this.paint(gOffScreen);
         gOffScreen.setColor(c);
-        g.drawImage(offScreen, 0, 0, null);    //将新画好的画布“贴”在原画布上
+        //将新画好的画布“贴”在原画布上
+        g.drawImage(offScreen, 0, 0, null);
     }
 
     /*
      * 重画线程（每隔30毫秒重画一次）
      */
     private class RepaintThread implements Runnable {
+        @Override
         public void run() {
             while (true) {
                 //调用重画方法
@@ -371,6 +383,7 @@ public class DataView extends Frame {
         /**
          * 处理监控到的串口事件
          */
+        @Override
         public void serialEvent(SerialPortEvent serialPortEvent) {
 
             switch (serialPortEvent.getEventType()) {

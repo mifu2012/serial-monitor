@@ -1,7 +1,7 @@
-package org.mif.serial.monitor.serialPort;
+package org.mif.serial.monitor.serialport;
 
 
-import org.mif.serial.monitor.serialException.ExceptionWriter;
+import org.mif.serial.monitor.serialexception.ExceptionWriter;
 
 import javax.swing.*;
 import java.awt.*;

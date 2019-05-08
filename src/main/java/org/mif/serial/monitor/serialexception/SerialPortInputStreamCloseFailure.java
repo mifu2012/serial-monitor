@@ -1,4 +1,4 @@
-package org.mif.serial.monitor.serialException;
+package org.mif.serial.monitor.serialexception;
 
 public class SerialPortInputStreamCloseFailure extends Exception {
 	/**
@@ -10,7 +10,7 @@ public class SerialPortInputStreamCloseFailure extends Exception {
 
 	@Override
 	public String toString() {
-		return "¹Ø±Õ´®¿Ú¶ÔÏóÊäÈëÁ÷£¨InputStream£©Ê±³ö´í£¡";
+		return "å…³é—­ä¸²å£å¯¹è±¡è¾“å…¥æµï¼ˆInputStreamï¼‰æ—¶å‡ºé”™ï¼";
 	}
 	
 	
