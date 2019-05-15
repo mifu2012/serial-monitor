@@ -3,7 +3,6 @@ package org.mif.serial.monitor.serialport;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.mif.serial.monitor.serialexception.ExceptionWriter;
 import org.mif.serial.monitor.serialexception.ReadDataFromSerialPortFailure;
@@ -17,13 +16,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * 监测数据显示类
  *
  * @author Zhong
  */
-@Slf4j
 public class DataView extends Frame {
 
     /**
@@ -411,7 +410,7 @@ public class DataView extends Frame {
 
                 case SerialPortEvent.DATA_AVAILABLE: // 1 串口存在可用数据
 
-                    log.info("found data");
+                    System.out.println("found data");
                     byte[] data = null;
 
                     try {
@@ -420,8 +419,7 @@ public class DataView extends Frame {
                         } else {
                             data = SerialTool.readFromPort(serialPort);    //读取数据，存入字节数组
                             String dataOriginal = new String(data);
-                            log.info("read data =【{}】", dataOriginal);
-
+                            System.out.println("read data=" + dataOriginal);
                             //自定义解析过程
                             HttpClientUtils utils = HttpClientUtils.getInstance();
                             String equipNo = plcChoice.getSelectedItem();

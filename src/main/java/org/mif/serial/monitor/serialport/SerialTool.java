@@ -53,7 +53,7 @@ public class SerialTool {
         //获得当前所有可用串口
         Enumeration<CommPortIdentifier> portList = CommPortIdentifier.getPortIdentifiers();
 
-        ArrayList<String> portNameList = new ArrayList<>();
+        ArrayList<String> portNameList = new ArrayList<String>();
 
         //将可用串口名添加到List并返回该List
         while (portList.hasMoreElements()) {

@@ -17,8 +17,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.mif.serial.monitor.vo.EquipmentVO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,14 +29,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 public class HttpClientUtils {
-    private final Logger log = LoggerFactory.getLogger(HttpClientUtils.class);
 
     private final int DEFAULT_TIMEOUT = 30000;
 
-//    private final static String url = "http://localhost:8080";
+    //    private final static String url = "http://localhost:8080";
     private final static String url = "http://47.96.156.130:8080";
 
 
@@ -70,7 +68,6 @@ public class HttpClientUtils {
 
     public String doGetWithJsonResult(String uri) {
         String json = null;
-        log.debug("========= Call [{}] Start ==========", uri);
         HttpResponse response = null;
         try {
             HttpGet request = new HttpGet(uri);
@@ -78,13 +75,12 @@ public class HttpClientUtils {
                     .setConnectTimeout(timeout).setSocketTimeout(timeout).build();
             request.setConfig(config);
             response = client.execute(request);
-            log.debug("Response status code: {}", response.getStatusLine().getStatusCode());
+            System.out.println("Response status code: " + response.getStatusLine().getStatusCode());
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 json = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-                log.debug("Payload : {}", json);
             }
         } catch (Exception e) {
-            log.error("HttpClient has exception! message: {}", e.getMessage(), e);
+            e.printStackTrace();
             return null;
         } finally {
             try {
@@ -92,57 +88,15 @@ public class HttpClientUtils {
                     EntityUtils.consume(response.getEntity());
                 }
             } catch (IOException e) {
-                log.error("HttpClient has exception! message: {}", e.getMessage(), e);
+                e.printStackTrace();
             }
         }
-        log.debug("========= Call [{}] End ==========", uri);
-        return json;
-    }
-
-    public String doGetWithJsonResult(String uri, int timeout) {
-        setTimeout(timeout);
-        return doGetWithJsonResult(uri);
-    }
-
-    public String doGetCustom(String uri) {
-        String json = null;
-        log.debug("========= Call [{}] Start ==========", uri);
-        HttpResponse response = null;
-        try {
-            HttpGet request = new HttpGet(uri);
-            RequestConfig config = RequestConfig.custom().setConnectionRequestTimeout(timeout)
-                    .setConnectTimeout(timeout).setSocketTimeout(timeout).build();
-
-            request.setConfig(config);
-            client = HttpClients.custom().setDefaultRequestConfig(config)
-                    .setMaxConnTotal(maxConnTotal)
-                    .setMaxConnPerRoute(maxConnPerRoute).build();
-            response = client.execute(request);
-            log.debug("Response status code: {}", response.getStatusLine().getStatusCode());
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                json = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-                log.debug("Payload : {}", json);
-            }
-        } catch (Exception e) {
-            log.error("HttpClient has exception! message: {}", e.getMessage(), e);
-            return null;
-        } finally {
-            try {
-                if (response != null) {
-                    EntityUtils.consume(response.getEntity());
-                }
-            } catch (IOException e) {
-                log.error("HttpClient has exception! message: {}", e.getMessage(), e);
-            }
-        }
-        log.debug("========= Call [{}] End ==========", uri);
         return json;
     }
 
 
     public String doPostWithJsonResult(String uri, Map<String, String> paramMap) {
         String json = null;
-        log.debug("========= Call [{}] Start ==========", uri);
         HttpResponse response = null;
         try {
             HttpPost request = new HttpPost(uri);
@@ -157,14 +111,14 @@ public class HttpClientUtils {
                 request.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
             }
             response = client.execute(request);
-            log.debug("Response status code: {}", response.getStatusLine().getStatusCode());
+            System.out.println("Response status code: " + response.getStatusLine().getStatusCode());
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 json = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-                log.debug("Payload : {}", json);
+                System.out.println("Payload : " + json);
             }
             request.releaseConnection();
         } catch (Exception e) {
-            log.error("HttpClient has exception! message: {}", e.getMessage(), e);
+            e.printStackTrace();
             return null;
         } finally {
             try {
@@ -172,39 +126,14 @@ public class HttpClientUtils {
                     EntityUtils.consume(response.getEntity());
                 }
             } catch (IOException e) {
-                log.error("HttpClient has exception! message: {}", e.getMessage(), e);
+                e.printStackTrace();
             }
         }
-        log.debug("========= Call [{}] End ==========", uri);
         return json;
     }
 
 
-    public String doPostWithJsonResult(String uri, String jsonParameters) {
-        log.debug("========= Call [{}] Start ==========", uri);
-        log.debug("========= Call [{}] Start ==========", jsonParameters);
-        HttpPost request = new HttpPost(uri);
-        RequestConfig config = RequestConfig.custom().setConnectionRequestTimeout(timeout)
-                .setConnectTimeout(timeout).setSocketTimeout(timeout).build();
-        request.setConfig(config);
-        request.setEntity(new StringEntity(jsonParameters, ContentType.APPLICATION_JSON));
-        HttpResponse response = null;
-        String responseStr = null;
-        try {
-            response = client.execute(request);
-            log.debug("Response status code: {}", response.getStatusLine().getStatusCode());
-            responseStr = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-            log.debug("Payload : {}", responseStr);
-        } catch (Exception e) {
-            log.error(e.getMessage(), new IllegalStateException(e));
-        }
-        log.debug("========= Call [{}] End ==========", uri);
-        return responseStr;
-
-    }
-
     public String doPost(String url, String jsonStr) {
-        log.debug("========= Call [{}] Start ==========", url);
         URL u = null;
         HttpURLConnection con = null;
 
@@ -223,13 +152,13 @@ public class HttpClientUtils {
             if (jsonStr != null && !"".equals(jsonStr)) {
                 OutputStreamWriter osw = new OutputStreamWriter(
                         con.getOutputStream(), "UTF-8");
-                log.debug("即将发送参数:{}", jsonStr);
+                System.out.println("即将发送参数:" + jsonStr);
                 osw.write(jsonStr);
                 osw.flush();
                 osw.close();
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), new IllegalStateException(e));
+            e.printStackTrace();
         } finally {
             if (con != null) {
                 con.disconnect();
@@ -246,7 +175,7 @@ public class HttpClientUtils {
                 buffer.append(temp);
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), new IllegalStateException(e));
+            e.printStackTrace();
         } finally {
             if (br != null) {
                 try {
@@ -257,8 +186,7 @@ public class HttpClientUtils {
             }
         }
         String result = buffer.toString();
-        log.debug("Payload: {}", result);
-        log.debug("========= Call [{}] End ==========", url);
+        System.out.println("Payload: " + result);
         return result;
     }
 
@@ -284,7 +212,7 @@ public class HttpClientUtils {
 
     public List<EquipmentVO> getPlcList() {
         String result = doPost(url + "/api/plcList", null, 3000);
-        log.info("result={}", result);
+        System.out.println("result=" + result);
         List<EquipmentVO> equipmentVOS = JSON.parseArray(result, EquipmentVO.class);
         if (CollectionUtils.isEmpty(equipmentVOS)) {
             return null;
@@ -297,7 +225,7 @@ public class HttpClientUtils {
         map.put("equipNo", equipNo);
 
         String result = doPostWithJsonResult(url + "/api/plcDetail", map);
-        log.info("result={}", result);
+        System.out.println("result=" + result);
         EquipmentVO equipmentVO = JSON.parseObject(result, EquipmentVO.class);
         return equipmentVO;
     }
@@ -307,7 +235,7 @@ public class HttpClientUtils {
         map.put("equipNo", equipNo);
         map.put("content", dataOriginal);
         String result = doPostWithJsonResult(url + "/api/transData", map);
-        log.info("result={}", result);
+        System.out.println("sendTransData result=" + result);
 
     }
 }
