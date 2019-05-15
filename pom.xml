@@ -91,7 +91,7 @@
                     <archive>
                         <manifest>
                             <!-- 此处指定main方法入口的class -->
-                            <mainClass>org.mif.serial.monitor.serialport.Client</mainClass>
+                            <mainClass>org.mif.serial.monitor.frame.LoginFrame</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
