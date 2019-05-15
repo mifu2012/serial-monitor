@@ -3,10 +3,12 @@ package org.mif.serial.monitor.serialport;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
+import io.netty.channel.Channel;
 import org.apache.commons.lang3.StringUtils;
 import org.mif.serial.monitor.serialexception.ExceptionWriter;
 import org.mif.serial.monitor.serialexception.ReadDataFromSerialPortFailure;
 import org.mif.serial.monitor.serialexception.SerialPortInputStreamCloseFailure;
+import org.mif.serial.monitor.soket.NettyClient;
 import org.mif.serial.monitor.vo.EquipmentVO;
 
 import javax.swing.*;
@@ -16,7 +18,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * 监测数据显示类
@@ -29,8 +30,6 @@ public class DataView extends Frame {
      *
      */
     private static final long serialVersionUID = 1L;
-
-    Client client = null;
 
     private List<EquipmentVO> pclList; //PLC列表
 
@@ -62,11 +61,24 @@ public class DataView extends Frame {
 
     /**
      * 类的构造方法
-     *
-     * @param client
      */
-    public DataView(Client client) {
-        this.client = client;
+    public DataView() {
+        this.setBounds(200, 70, 800, 620);    //设定程序在桌面出现的位置
+        this.setTitle("CDIO工程项目");    //设置程序标题
+        this.setBackground(Color.white);    //设置背景色
+
+        this.addWindowListener(new WindowAdapter() {
+            //添加对窗口状态的监听
+            public void windowClosing(WindowEvent arg0) {
+                //当窗口关闭时
+                System.exit(0);    //退出程序
+            }
+
+        });
+
+        this.setResizable(false);    //窗口大小不可更改
+        this.setVisible(true);    //显示窗口
+
         //程序初始化时就扫描一次有效串口
         commList = SerialTool.findPort();
         HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
@@ -79,7 +91,7 @@ public class DataView extends Frame {
      * 添加Label、按钮、下拉条及相关事件监听；
      */
     public void dataFrame() {
-        this.setBounds(Client.LOC_X, Client.LOC_Y, Client.WIDTH, Client.HEIGHT);
+        this.setBounds(200, 70, 800, 620);
         this.setTitle("PC辅助软件");
         this.setIconImage(icon);
         this.setBackground(Color.white);
@@ -186,6 +198,8 @@ public class DataView extends Frame {
         openSerialButton.setFont(new Font("微软雅黑", Font.BOLD, 20));
         openSerialButton.setForeground(Color.darkGray);
         add(openSerialButton);
+
+
         //添加打开串口按钮的事件监听
         openSerialButton.addActionListener(new ActionListener() {
 
@@ -205,8 +219,9 @@ public class DataView extends Frame {
 //                    } else {
                     //串口名、波特率均获取正确时
                     String bpsStr = baudRate.getText();
-                    if (StringUtils.isEmpty(bpsStr)) {
+                    if (StringUtils.isEmpty(bpsStr) || bpsStr.equals("暂无数据")) {
                         JOptionPane.showMessageDialog(null, "请先完善PLC资料！", "错误", JOptionPane.INFORMATION_MESSAGE);
+                        return;
                     }
                     int bps = Integer.parseInt(bpsStr);
                     try {
@@ -218,9 +233,12 @@ public class DataView extends Frame {
                         //监听成功进行提示
                         JOptionPane.showMessageDialog(null, "监听成功，稍后将显示监测数据！", "提示", JOptionPane.INFORMATION_MESSAGE);
 
+                        // tcp 注册
+                        new NettyClient("localhost", 8089).run();
                     } catch (Exception e1) {
                         //发生错误时使用一个Dialog提示具体的错误信息
                         JOptionPane.showMessageDialog(null, e1, "错误", JOptionPane.INFORMATION_MESSAGE);
+                        return;
                     }
 //                    }
                 }
@@ -230,8 +248,6 @@ public class DataView extends Frame {
 
 
         this.setResizable(false);
-        //启动重画线程
-        new Thread(new RepaintThread()).start();
 
     }
 
@@ -274,26 +290,6 @@ public class DataView extends Frame {
         g.setFont(new Font("微软雅黑", Font.BOLD, 20));
         g.drawString(" 串口选择： ", 50, 410);
 
-    }
-
-    /**
-     * 双缓冲方式重画界面各元素组件
-     */
-    @Override
-    public void update(Graphics g) {
-        if (offScreen == null) {
-            offScreen = this.createImage(Client.WIDTH, Client.HEIGHT);
-        }
-        Graphics gOffScreen = offScreen.getGraphics();
-        Color c = gOffScreen.getColor();
-        gOffScreen.setColor(Color.white);
-        //重画背景画布
-        gOffScreen.fillRect(0, 0, Client.WIDTH, Client.HEIGHT);
-        //重画界面元素
-        this.paint(gOffScreen);
-        gOffScreen.setColor(c);
-        //将新画好的画布“贴”在原画布上
-        g.drawImage(offScreen, 0, 0, null);
     }
 
     /*
@@ -421,10 +417,13 @@ public class DataView extends Frame {
                             String dataOriginal = new String(data);
                             System.out.println("read data=" + dataOriginal);
                             //自定义解析过程
-                            HttpClientUtils utils = HttpClientUtils.getInstance();
-                            String equipNo = plcChoice.getSelectedItem();
-                            utils.sendTransData(equipNo, dataOriginal);
-
+//                            HttpClientUtils utils = HttpClientUtils.getInstance();
+//                            String equipNo = plcChoice.getSelectedItem();
+//                            utils.sendTransData(equipNo, dataOriginal);
+                            Channel channel = NettyClient.channel;
+                            if (null != channel) {
+                                channel.writeAndFlush(data);
+                            }
                         }
 
                     } catch (ReadDataFromSerialPortFailure e) {

@@ -36,8 +36,8 @@ public class HttpClientUtils {
 
     private final int DEFAULT_TIMEOUT = 30000;
 
-    //    private final static String url = "http://localhost:8080";
-    private final static String url = "http://47.96.156.130:8080";
+        private final static String url = "http://localhost:8080";
+//    private final static String url = "http://47.96.156.130:8080";
 
 
     private static HttpClientUtils ins;
@@ -236,6 +236,14 @@ public class HttpClientUtils {
         map.put("content", dataOriginal);
         String result = doPostWithJsonResult(url + "/api/transData", map);
         System.out.println("sendTransData result=" + result);
+    }
 
+    public String login(String userName, String password) {
+        Map map = new HashMap();
+        map.put("userName", userName);
+        map.put("password", password);
+        String result = doPostWithJsonResult(url + "/api/login", map);
+        System.out.println("login result =" + result);
+        return result;
     }
 }
