@@ -3,6 +3,7 @@ package org.mif.serial.monitor.serialport;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import org.apache.commons.lang3.StringUtils;
 import org.mif.serial.monitor.serialexception.ExceptionWriter;
@@ -34,7 +35,7 @@ public class DataView extends Frame {
     private List<EquipmentVO> pclList; //PLC列表
 
     private List<String> commList;    //保存可用端口号
-    private SerialPort serialPort = null;    //保存串口对象
+    public static SerialPort serialPort = null;    //保存串口对象
 
 
     private Choice plcChoice = new Choice();    //PLC编码（下拉框）
@@ -52,6 +53,9 @@ public class DataView extends Frame {
     private Choice bpsChoice = new Choice();    //波特率选择
 
     private Button openSerialButton = new Button("打开串口");
+
+    private static String plcChannelId;
+
 
     Image offScreen = null;    //重画时的画布
 
@@ -124,6 +128,7 @@ public class DataView extends Frame {
                     parityBit.setText(equipmentVO.getParityBit());
                     stopBit.setText(equipmentVO.getStopBit());
                     linkedMethod.setText(equipmentVO.getLinkedMethod());
+                    plcChannelId = equipmentVO.getChannelId();
                 }
             }
 
@@ -147,6 +152,7 @@ public class DataView extends Frame {
             parityBit.setText(vo.getParityBit());
             stopBit.setText(vo.getStopBit());
             linkedMethod.setText(vo.getLinkedMethod());
+            plcChannelId = vo.getChannelId();
         });
 
 
@@ -234,7 +240,13 @@ public class DataView extends Frame {
                         JOptionPane.showMessageDialog(null, "监听成功，稍后将显示监测数据！", "提示", JOptionPane.INFORMATION_MESSAGE);
 
                         // tcp 注册
-                        new NettyClient("localhost", 8089).run();
+                        Channel localhost = new NettyClient("localhost", 8089).run();
+
+                        //Http
+
+                        localhost.writeAndFlush(Unpooled.copiedBuffer(("BIND_" + plcChannelId).getBytes()));
+
+
                     } catch (Exception e1) {
                         //发生错误时使用一个Dialog提示具体的错误信息
                         JOptionPane.showMessageDialog(null, e1, "错误", JOptionPane.INFORMATION_MESSAGE);
@@ -406,7 +418,6 @@ public class DataView extends Frame {
 
                 case SerialPortEvent.DATA_AVAILABLE: // 1 串口存在可用数据
 
-                    System.out.println("found data");
                     byte[] data = null;
 
                     try {
@@ -414,15 +425,11 @@ public class DataView extends Frame {
                             JOptionPane.showMessageDialog(null, "串口对象为空！监听失败！", "错误", JOptionPane.INFORMATION_MESSAGE);
                         } else {
                             data = SerialTool.readFromPort(serialPort);    //读取数据，存入字节数组
-                            String dataOriginal = new String(data);
-                            System.out.println("read data=" + dataOriginal);
+                            System.out.println("read data=" + data.toString());
                             //自定义解析过程
-//                            HttpClientUtils utils = HttpClientUtils.getInstance();
-//                            String equipNo = plcChoice.getSelectedItem();
-//                            utils.sendTransData(equipNo, dataOriginal);
                             Channel channel = NettyClient.channel;
                             if (null != channel) {
-                                channel.writeAndFlush(data);
+                                channel.writeAndFlush(Unpooled.copiedBuffer(data));
                             }
                         }
 
@@ -434,12 +441,10 @@ public class DataView extends Frame {
                     }
 
                     break;
-
             }
 
         }
 
     }
-
 
 }

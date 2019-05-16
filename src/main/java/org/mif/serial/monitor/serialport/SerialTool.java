@@ -58,6 +58,7 @@ public class SerialTool {
         //将可用串口名添加到List并返回该List
         while (portList.hasMoreElements()) {
             String portName = portList.nextElement().getName();
+            System.out.printf("portName = " + portName);
             portNameList.add(portName);
         }
 

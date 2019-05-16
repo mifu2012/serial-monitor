@@ -26,7 +26,7 @@ public class NettyClient {
     }
 
 
-    public void run() {
+    public Channel run() {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap()
@@ -49,10 +49,12 @@ public class NettyClient {
             channel = cf.channel();
             System.out.println("------" + channel.localAddress().toString().substring(1) + "------");
 //                channel.writeAndFlush(msg + "\r\n");
+            return channel;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
 //            group.shutdownGracefully();
         }
+        return null;
     }
 }

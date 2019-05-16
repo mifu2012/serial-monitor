@@ -24,6 +24,7 @@ public class EquipmentVO  {
 
     private String linkedMethod;
 
+    private String channelId;
 
 
 }

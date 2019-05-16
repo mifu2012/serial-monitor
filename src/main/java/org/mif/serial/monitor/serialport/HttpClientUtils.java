@@ -230,14 +230,6 @@ public class HttpClientUtils {
         return equipmentVO;
     }
 
-    public void sendTransData(String equipNo, String dataOriginal) {
-        Map map = new HashMap();
-        map.put("equipNo", equipNo);
-        map.put("content", dataOriginal);
-        String result = doPostWithJsonResult(url + "/api/transData", map);
-        System.out.println("sendTransData result=" + result);
-    }
-
     public String login(String userName, String password) {
         Map map = new HashMap();
         map.put("userName", userName);
