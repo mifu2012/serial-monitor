@@ -6,7 +6,7 @@ import gnu.io.SerialPortEventListener;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import org.apache.commons.lang3.StringUtils;
-import org.mif.serial.monitor.serialexception.ExceptionWriter;
+import org.mif.serial.monitor.Constants;
 import org.mif.serial.monitor.serialexception.ReadDataFromSerialPortFailure;
 import org.mif.serial.monitor.serialexception.SerialPortInputStreamCloseFailure;
 import org.mif.serial.monitor.soket.NettyClient;
@@ -240,7 +240,7 @@ public class DataView extends Frame {
                         JOptionPane.showMessageDialog(null, "监听成功，稍后将显示监测数据！", "提示", JOptionPane.INFORMATION_MESSAGE);
 
                         // tcp 注册
-                        Channel localhost = new NettyClient("47.96.156.130", 8089).run();
+                        Channel localhost = new NettyClient(Constants.REMOTE_ADDR, Constants.REMOTE_N_PORT).run();
 
                         //Http
                         localhost.writeAndFlush(Unpooled.copiedBuffer(("BIND_" + plcChannelId).getBytes()));
@@ -300,82 +300,6 @@ public class DataView extends Frame {
         g.setColor(Color.gray);
         g.setFont(new Font("微软雅黑", Font.BOLD, 20));
         g.drawString(" 串口选择： ", 50, 410);
-
-    }
-
-    /*
-     * 重画线程（每隔30毫秒重画一次）
-     */
-    private class RepaintThread implements Runnable {
-        @Override
-        public void run() {
-            while (true) {
-                //调用重画方法
-                repaint();
-
-
-                //扫描可用串口
-                commList = SerialTool.findPort();
-                if (commList != null && commList.size() > 0) {
-
-                    //添加新扫描到的可用串口
-                    for (String s : commList) {
-
-                        //该串口名是否已存在，初始默认为不存在（在commList里存在但在commChoice里不存在，则新添加）
-                        boolean commExist = false;
-
-                        for (int i = 0; i < commChoice.getItemCount(); i++) {
-                            if (s.equals(commChoice.getItem(i))) {
-                                //当前扫描到的串口名已经在初始扫描时存在
-                                commExist = true;
-                                break;
-                            }
-                        }
-
-                        if (commExist) {
-                            //当前扫描到的串口名已经在初始扫描时存在，直接进入下一次循环
-                            continue;
-                        } else {
-                            //若不存在则添加新串口名至可用串口下拉列表
-                            commChoice.add(s);
-                        }
-                    }
-
-                    //移除已经不可用的串口
-                    for (int i = 0; i < commChoice.getItemCount(); i++) {
-
-                        //该串口是否已失效，初始默认为已经失效（在commChoice里存在但在commList里不存在，则已经失效）
-                        boolean commNotExist = true;
-
-                        for (String s : commList) {
-                            if (s.equals(commChoice.getItem(i))) {
-                                commNotExist = false;
-                                break;
-                            }
-                        }
-
-                        if (commNotExist) {
-                            //System.out.println("remove" + commChoice.getItem(i));
-                            commChoice.remove(i);
-                        } else {
-                            continue;
-                        }
-                    }
-
-                } else {
-                    //如果扫描到的commList为空，则移除所有已有串口
-                    commChoice.removeAll();
-                }
-
-                try {
-                    Thread.sleep(30);
-                } catch (InterruptedException e) {
-                    String err = ExceptionWriter.getErrorInfoFromException(e);
-                    JOptionPane.showMessageDialog(null, err, "错误", JOptionPane.INFORMATION_MESSAGE);
-                    System.exit(0);
-                }
-            }
-        }
 
     }
 

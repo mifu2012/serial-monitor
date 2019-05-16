@@ -11,11 +11,10 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.mif.serial.monitor.Constants;
 import org.mif.serial.monitor.vo.EquipmentVO;
 
 import java.io.BufferedReader;
@@ -29,15 +28,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 
 public class HttpClientUtils {
 
     private final int DEFAULT_TIMEOUT = 30000;
-
-//        private final static String url = "http://localhost:8080";
-    private final static String url = "http://47.96.156.130:8080";
 
 
     private static HttpClientUtils ins;
@@ -211,7 +206,7 @@ public class HttpClientUtils {
 
 
     public List<EquipmentVO> getPlcList() {
-        String result = doPost(url + "/api/plcList", null, 3000);
+        String result = doPost(Constants.REMOTE_HTTP + "/api/plcList", null, 3000);
         System.out.println("result=" + result);
         List<EquipmentVO> equipmentVOS = JSON.parseArray(result, EquipmentVO.class);
         if (CollectionUtils.isEmpty(equipmentVOS)) {
@@ -224,7 +219,7 @@ public class HttpClientUtils {
         Map map = new HashMap();
         map.put("equipNo", equipNo);
 
-        String result = doPostWithJsonResult(url + "/api/plcDetail", map);
+        String result = doPostWithJsonResult(Constants.REMOTE_HTTP + "/api/plcDetail", map);
         System.out.println("result=" + result);
         EquipmentVO equipmentVO = JSON.parseObject(result, EquipmentVO.class);
         return equipmentVO;
@@ -234,7 +229,7 @@ public class HttpClientUtils {
         Map map = new HashMap();
         map.put("userName", userName);
         map.put("password", password);
-        String result = doPostWithJsonResult(url + "/api/login", map);
+        String result = doPostWithJsonResult(Constants.REMOTE_HTTP + "/api/login", map);
         System.out.println("login result =" + result);
         return result;
     }
