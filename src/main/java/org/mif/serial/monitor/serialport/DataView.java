@@ -240,10 +240,9 @@ public class DataView extends Frame {
                         JOptionPane.showMessageDialog(null, "监听成功，稍后将显示监测数据！", "提示", JOptionPane.INFORMATION_MESSAGE);
 
                         // tcp 注册
-                        Channel localhost = new NettyClient("localhost", 8089).run();
+                        Channel localhost = new NettyClient("47.96.156.130", 8089).run();
 
                         //Http
-
                         localhost.writeAndFlush(Unpooled.copiedBuffer(("BIND_" + plcChannelId).getBytes()));
 
 

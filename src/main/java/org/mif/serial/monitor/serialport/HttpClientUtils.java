@@ -36,8 +36,8 @@ public class HttpClientUtils {
 
     private final int DEFAULT_TIMEOUT = 30000;
 
-        private final static String url = "http://localhost:8080";
-//    private final static String url = "http://47.96.156.130:8080";
+//        private final static String url = "http://localhost:8080";
+    private final static String url = "http://47.96.156.130:8080";
 
 
     private static HttpClientUtils ins;
