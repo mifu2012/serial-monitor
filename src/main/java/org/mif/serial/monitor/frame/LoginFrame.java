@@ -2,55 +2,53 @@ package org.mif.serial.monitor.frame;
 
 import org.mif.serial.monitor.serialport.DataView;
 import org.mif.serial.monitor.serialport.HttpClientUtils;
-import org.mif.serial.monitor.soket.NettyClient;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * @description: ç™»å½•
+ * @description: µÇÂ¼
  * @author: mif
  * @date: 2019/5/15 22:21
  */
 public class LoginFrame extends JFrame {
 
     /**
-     * ç¨‹åºç•Œé¢å®½åº¦
+     * ³ÌĞò½çÃæ¿í¶È
      */
     public static final int WIDTH = 800;
 
     /**
-     * ç¨‹åºç•Œé¢é«˜åº¦
+     * ³ÌĞò½çÃæ¸ß¶È
      */
     public static final int HEIGHT = 620;
 
     /**
-     * ç¨‹åºç•Œé¢å‡ºç°ä½ç½®ï¼ˆæ¨ªåæ ‡ï¼‰
+     * ³ÌĞò½çÃæ³öÏÖÎ»ÖÃ£¨ºá×ø±ê£©
      */
     public static final int LOC_X = 200;
 
     /**
-     * ç¨‹åºç•Œé¢å‡ºç°ä½ç½®ï¼ˆçºµåæ ‡ï¼‰
+     * ³ÌĞò½çÃæ³öÏÖÎ»ÖÃ£¨×İ×ø±ê£©
      */
     public static final int LOC_Y = 70;
 
-    private static JButton loginBtn;//ç™»é™†æŒ‰é’®
-    private static JButton cancelBtn;//å¿˜è®°å¯†ç æŒ‰é’®
-    private static JLabel loginLabel;//ç™»å½•çš„ç‰ˆé¢
-    private static JFrame loginFrame;//ç™»é™†çš„æ¡†æ¶
-    private static JTextField textField;//ç”¨æˆ·å
-    private static JPasswordField passwordField;//å¯†ç 
+    private static JButton loginBtn;//µÇÂ½°´Å¥
+    private static JButton cancelBtn;//Íü¼ÇÃÜÂë°´Å¥
+    private static JLabel loginLabel;//µÇÂ¼µÄ°æÃæ
+    private static JFrame loginFrame;//µÇÂ½µÄ¿ò¼Ü
+    private static JTextField textField;//ÓÃ»§Ãû
+    private static JPasswordField passwordField;//ÃÜÂë
     private static JLabel nameLabel;
     private static JLabel passwordLabel;
 
-    public LoginFrame() {//åˆå§‹åŒ–ç™»é™†ç•Œé¢
-        Font font = new Font("é»‘ä½“", Font.PLAIN, 20);//è®¾ç½®å­—ä½“
-        loginFrame = new JFrame("PCç«¯è¾…åŠ©è½¯ä»¶");
+    public LoginFrame() {//³õÊ¼»¯µÇÂ½½çÃæ
+        Font font = new Font("ºÚÌå", Font.PLAIN, 20);//ÉèÖÃ×ÖÌå
+        loginFrame = new JFrame("PC¶Ë¸¨ÖúÈí¼ş");
         loginFrame.setBounds(200, 70, 450, 400);
-        //ç»™ç™»é™†ç•Œé¢æ·»åŠ èƒŒæ™¯å›¾ç‰‡
-        ImageIcon bgim = new ImageIcon("computer.png");//èƒŒæ™¯å›¾æ¡ˆ
+        //¸øµÇÂ½½çÃæÌí¼Ó±³¾°Í¼Æ¬
+        ImageIcon bgim = new ImageIcon("computer.png");//±³¾°Í¼°¸
         bgim.setImage(bgim.getImage().
                 getScaledInstance(bgim.getIconWidth(),
                         bgim.getIconHeight(),
@@ -58,28 +56,28 @@ public class LoginFrame extends JFrame {
         loginLabel = new JLabel();
         loginLabel.setIcon(bgim);
 
-        nameLabel = new JLabel("ç”¨æˆ·å");
+        nameLabel = new JLabel("ÓÃ»§Ãû");
         nameLabel.setBounds(20, 50, 60, 50);
         nameLabel.setFont(font);
 
-        passwordLabel = new JLabel("å¯†ç ");
+        passwordLabel = new JLabel("ÃÜÂë");
         passwordLabel.setBounds(20, 120, 60, 50);
         passwordLabel.setFont(font);
 
-        loginBtn = new JButton("ç™»é™†");         //æ›´æ”¹æˆloginButton
+        loginBtn = new JButton("µÇÂ½");         //¸ü¸Ä³ÉloginButton
         loginBtn.setBounds(90, 250, 100, 50);
         loginBtn.setFont(font);
 
-        cancelBtn = new JButton("é€€å‡º");
+        cancelBtn = new JButton("ÍË³ö");
         cancelBtn.setBounds(250, 250, 100, 50);
         cancelBtn.setFont(font);
 
-        //åŠ å…¥æ–‡æœ¬æ¡†
+        //¼ÓÈëÎÄ±¾¿ò
         textField = new JTextField("admin");
         textField.setBounds(150, 50, 250, 50);
         textField.setFont(font);
 
-        passwordField = new JPasswordField("123456");//å¯†ç è¾“å…¥æ¡†
+        passwordField = new JPasswordField("123456");//ÃÜÂëÊäÈë¿ò
         passwordField.setBounds(150, 120, 250, 50);
         passwordField.setFont(font);
 
@@ -99,41 +97,42 @@ public class LoginFrame extends JFrame {
 
     public static void main(String[] args) {
 
-        //åˆå§‹åŒ–ç™»é™†ç•Œé¢
+        //³õÊ¼»¯µÇÂ½½çÃæ
         LoginFrame hl = new LoginFrame();
         /**
-         * å¤„ç†ç‚¹å‡»äº‹ä»¶
-         * 1.ç™»é™†æŒ‰é’®ç‚¹å‡»äº‹ä»¶ï¼Œåˆ¤æ–­è´¦å·å¯†ç æ˜¯å¦æ­£ç¡®ï¼Œè‹¥æ­£ç¡®ï¼Œå¼¹å‡ºç›‘æµ‹ä¿¡æ¯ç•Œé¢
-         * å¦åˆ™ï¼Œæ— å“åº”ï¼ˆæš‚æ—¶æ— å“åº”ï¼‰
-         * ï¼šåå¯åœ¨ç™»é™†ç•Œé¢æ·»åŠ ä¸€ä¸ªlogLabelæç¤ºç”¨æˆ·æ˜¯å¦ç”¨æˆ·å¯†ç æ­£ç¡®
-         * 2.é€€å‡ºæŒ‰é’®ï¼Œç›´æ¥é€€å‡ºç¨‹åº
+         * ´¦Àíµã»÷ÊÂ¼ş
+         * 1.µÇÂ½°´Å¥µã»÷ÊÂ¼ş£¬ÅĞ¶ÏÕËºÅÃÜÂëÊÇ·ñÕıÈ·£¬ÈôÕıÈ·£¬µ¯³ö¼à²âĞÅÏ¢½çÃæ
+         * ·ñÔò£¬ÎŞÏìÓ¦£¨ÔİÊ±ÎŞÏìÓ¦£©
+         * £ººó¿ÉÔÚµÇÂ½½çÃæÌí¼ÓÒ»¸ölogLabelÌáÊ¾ÓÃ»§ÊÇ·ñÓÃ»§ÃÜÂëÕıÈ·
+         * 2.ÍË³ö°´Å¥£¬Ö±½ÓÍË³ö³ÌĞò
          */
-        //ç™»é™†ç‚¹å‡»äº‹ä»¶
+        //µÇÂ½µã»÷ÊÂ¼ş
         ActionListener bt1_ls = arg0 -> {
             // TODO Auto-generated method stub
             String admin = textField.getText();
             char[] password = passwordField.getPassword();
-            String str = String.valueOf(password); //å°†charæ•°ç»„è½¬åŒ–ä¸ºstringç±»å‹
+            String str = String.valueOf(password); //½«charÊı×é×ª»¯ÎªstringÀàĞÍ
 
             HttpClientUtils utils = HttpClientUtils.getInstance();
             String result = utils.login(admin, str);
+
             if (result.equals("\"success\"")) {
 
                 DataView dataView = new DataView();
 //                    dataView.setVisible(true);
                 dataView.dataFrame();
 
-                hl.loginFrame.dispose();//é”€æ¯å½“å‰ç•Œé¢
+                hl.loginFrame.dispose();//Ïú»Ùµ±Ç°½çÃæ
             } else {
-                JOptionPane.showMessageDialog(null, "å¸å·æˆ–å¯†ç é”™è¯¯", "é”™è¯¯", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "ÕÊºÅ»òÃÜÂë´íÎó", "´íÎó", JOptionPane.INFORMATION_MESSAGE);
             }
 
         };
         loginBtn.addActionListener(bt1_ls);
 
-        //é€€å‡ºäº‹ä»¶çš„å¤„ç†
+        //ÍË³öÊÂ¼şµÄ´¦Àí
         ActionListener bt2_ls = e -> {
-            System.exit(0);//ç»ˆæ­¢å½“å‰ç¨‹åº
+            System.exit(0);//ÖÕÖ¹µ±Ç°³ÌĞò
         };
         cancelBtn.addActionListener(bt2_ls);
 
