@@ -233,4 +233,13 @@ public class HttpClientUtils {
         System.out.println("login result =" + result);
         return result;
     }
+
+
+    public String update(Map<String,String> map){
+        String result = doPostWithJsonResult(Constants.REMOTE_HTTP + "/api/updateEquipment", map);
+        System.out.println("update result ="+result);
+        return result;
+    }
+
+
 }

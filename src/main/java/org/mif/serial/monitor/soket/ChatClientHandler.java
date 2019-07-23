@@ -1,15 +1,11 @@
 package org.mif.serial.monitor.soket;
 
 import gnu.io.SerialPort;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import org.mif.serial.monitor.serialport.DataView;
-import org.mif.serial.monitor.serialport.SerialTool;
 
 import java.io.OutputStream;
-import java.util.ArrayList;
 
 //自定义一个客户端业务处理类
 public class ChatClientHandler extends ChannelHandlerAdapter {

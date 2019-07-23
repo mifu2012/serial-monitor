@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 public class EquipmentVO  {
 
+
     private String equipmentNo;
 
     private String samplingPeriod;
