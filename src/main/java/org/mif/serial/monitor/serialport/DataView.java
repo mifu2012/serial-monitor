@@ -42,7 +42,6 @@ public class DataView extends Frame {
 
     private Font font = new Font("微软雅黑", Font.BOLD, 25);
 
-    private static JTextField statusFile = new JTextField();//用户名
     private static Choice baudRate = new Choice();
     //    private static JComboBox equipmentLength = new JComboBox(new String[]{"0x0000","0x1000"});    //长度
     private static Choice equipmentLength = new Choice();    //长度
@@ -132,8 +131,6 @@ public class DataView extends Frame {
                 EquipmentVO equipmentVO = pclList.get(i);
                 plcChoice.add(equipmentVO.getEquipmentNo());
                 if (i == 0) {
-                    statusFile.setText("在线");
-//                    baudRate.setSelectedItem(equipmentVO.getBaudRate());
                     baudRate.select(equipmentVO.getBaudRate());
                     equipmentLength.select(equipmentVO.getEquipmentLength());
                     parityBit.select(equipmentVO.getParityBit());
@@ -156,7 +153,6 @@ public class DataView extends Frame {
                 JOptionPane.showMessageDialog(null, "没有获取到PLC数据！", "错误", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-//            baudRate.setSelectedItem(vo.getBaudRate());
             baudRate.select(vo.getBaudRate());
             equipmentLength.select(vo.getEquipmentLength());
             parityBit.select(vo.getParityBit());
@@ -183,7 +179,6 @@ public class DataView extends Frame {
                     EquipmentVO equipmentVO = pclList.get(i);
                     plcChoice.add(equipmentVO.getEquipmentNo());
                     if (i == 0) {
-                        statusFile.setText("在线");
                         baudRate.select(equipmentVO.getBaudRate());
                         equipmentLength.select(equipmentVO.getEquipmentLength());
                         parityBit.select(equipmentVO.getParityBit());
@@ -262,11 +257,11 @@ public class DataView extends Frame {
         add(updateButton);
 
         updateButton.addActionListener(e -> {
-            String baudRateV = (String) baudRate.getSelectedItem();
-            String equipmentLengthV = (String) equipmentLength.getSelectedItem();
-            String parityBitV = (String) parityBit.getSelectedItem();
-            String stopBitV = (String) stopBit.getSelectedItem();
-            String linkedMethodV = (String) linkedMethod.getSelectedItem();
+            String baudRateV = baudRate.getSelectedItem();
+            String equipmentLengthV = equipmentLength.getSelectedItem();
+            String parityBitV = parityBit.getSelectedItem();
+            String stopBitV = stopBit.getSelectedItem();
+            String linkedMethodV = linkedMethod.getSelectedItem();
             String equipNO = plcChoice.getSelectedItem();
 
             Map<String, String> paramMap = new HashMap<>();

@@ -50,17 +50,17 @@ public class SerialTool {
      */
     public static final ArrayList<String> findPort() {
 
-        //获得当前所有可用串口 TODO
-//        Enumeration<CommPortIdentifier> portList = CommPortIdentifier.getPortIdentifiers();
+        //获得当前所有可用串口
+        Enumeration<CommPortIdentifier> portList = CommPortIdentifier.getPortIdentifiers();
 
         ArrayList<String> portNameList = new ArrayList<String>();
 
         //将可用串口名添加到List并返回该List
-//        while (portList.hasMoreElements()) {
-//            String portName = portList.nextElement().getName();
-//            System.out.printf("portName = " + portName);
-//            portNameList.add(portName);
-//        }
+        while (portList.hasMoreElements()) {
+            String portName = portList.nextElement().getName();
+            System.out.printf("portName = " + portName);
+            portNameList.add(portName);
+        }
 
         return portNameList;
 

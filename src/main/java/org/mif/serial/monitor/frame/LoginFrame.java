@@ -108,7 +108,6 @@ public class LoginFrame extends JFrame {
          */
         //登陆点击事件
         ActionListener bt1_ls = arg0 -> {
-            // TODO Auto-generated method stub
             String admin = textField.getText();
             char[] password = passwordField.getPassword();
             String str = String.valueOf(password); //将char数组转化为string类型
