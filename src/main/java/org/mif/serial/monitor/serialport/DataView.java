@@ -78,7 +78,7 @@ public class DataView extends Frame {
      */
     public DataView() {
         this.setBounds(200, 70, 800, 620);    //设定程序在桌面出现的位置
-        this.setTitle("PC辅助软件");    //设置程序标题
+        this.setTitle("PC端辅助软件");    //设置程序标题
         this.setBackground(Color.white);    //设置背景色
 
         this.addWindowListener(new WindowAdapter() {
@@ -174,19 +174,28 @@ public class DataView extends Frame {
         add(freshButton);
 
         freshButton.addActionListener(e -> {
-            String equipNO =  plcChoice.getSelectedItem();
-            EquipmentVO vo = httpClientUtils.getPlcDetail(equipNO);
-            if (null == vo) {
-                JOptionPane.showMessageDialog(null, "没有获取到PLC数据！", "错误", JOptionPane.INFORMATION_MESSAGE);
-                return;
+            //程序初始化时就扫描一次有效串口
+            plcChoice.removeAll();
+            pclList = httpClientUtils.getPlcList();
+            if (null != pclList) {
+
+                for (int i = 0; i < pclList.size(); i++) {
+                    EquipmentVO equipmentVO = pclList.get(i);
+                    plcChoice.add(equipmentVO.getEquipmentNo());
+                    if (i == 0) {
+                        statusFile.setText("在线");
+                        baudRate.select(equipmentVO.getBaudRate());
+                        equipmentLength.select(equipmentVO.getEquipmentLength());
+                        parityBit.select(equipmentVO.getParityBit());
+                        stopBit.select(equipmentVO.getStopBit());
+                        linkedMethod.select(equipmentVO.getLinkedMethod());
+                        plcChannelId = equipmentVO.getChannelId();
+                    }
+                }
+
+            } else {
+                plcChoice.add("--暂无PLC--");
             }
-            baudRate.select(vo.getBaudRate());
-            equipmentLength.select(vo.getEquipmentLength());
-            parityBit.select(vo.getParityBit());
-            stopBit.select(vo.getStopBit());
-            linkedMethod.select(vo.getLinkedMethod());
-            plcChannelId = vo.getChannelId();
-            plcChannelId = vo.getChannelId();
 
         });
 
