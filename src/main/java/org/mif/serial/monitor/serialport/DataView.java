@@ -7,6 +7,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import org.apache.commons.lang3.StringUtils;
 import org.mif.serial.monitor.Constants;
+import org.mif.serial.monitor.constants.EqMaps;
 import org.mif.serial.monitor.serialexception.ReadDataFromSerialPortFailure;
 import org.mif.serial.monitor.serialexception.SerialPortInputStreamCloseFailure;
 import org.mif.serial.monitor.soket.NettyClient;
@@ -131,12 +132,7 @@ public class DataView extends Frame {
                 EquipmentVO equipmentVO = pclList.get(i);
                 plcChoice.add(equipmentVO.getEquipmentNo());
                 if (i == 0) {
-                    baudRate.select(equipmentVO.getBaudRate());
-                    equipmentLength.select(equipmentVO.getEquipmentLength());
-                    parityBit.select(equipmentVO.getParityBit());
-                    stopBit.select(equipmentVO.getStopBit());
-                    linkedMethod.select(equipmentVO.getLinkedMethod());
-                    plcChannelId = equipmentVO.getChannelId();
+                    setSelect(equipmentVO);
                 }
             }
 
@@ -153,13 +149,7 @@ public class DataView extends Frame {
                 JOptionPane.showMessageDialog(null, "没有获取到PLC数据！", "错误", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            baudRate.select(vo.getBaudRate());
-            equipmentLength.select(vo.getEquipmentLength());
-            parityBit.select(vo.getParityBit());
-            stopBit.select(vo.getStopBit());
-            linkedMethod.select(vo.getLinkedMethod());
-            plcChannelId = vo.getChannelId();
-            plcChannelId = vo.getChannelId();
+            setSelect(vo);
         });
 
         //刷新按钮
@@ -204,34 +194,34 @@ public class DataView extends Frame {
         baudRate.setFont(font);
         baudRate.setForeground(Color.black);
         add(baudRate);
-
         equipmentLength.setBounds(520, 123, 225, 40);
-        equipmentLength.add("0x0000");
-        equipmentLength.add("0x1000");
+        equipmentLength.add("8位");
+        equipmentLength.add("9位");
+
         equipmentLength.setFont(font);
         equipmentLength.setForeground(Color.black);
         add(equipmentLength);
 
         parityBit.setBounds(150, 213, 225, 40);
-        parityBit.add("0x0000");
-        parityBit.add("0x0400");
-        parityBit.add("0x0500");
+        parityBit.add("无校验位");
+        parityBit.add("偶校验位");
+        parityBit.add("奇校验位");
         parityBit.setFont(font);
         parityBit.setForeground(Color.black);
         add(parityBit);
 
         stopBit.setBounds(520, 213, 225, 40);
-        stopBit.add("0x0000");
-        stopBit.add("0x1000");
-        stopBit.add("0x2000");
-        stopBit.add("0x3000");
+        stopBit.add("0.5位");
+        stopBit.add("1位");
+        stopBit.add("1.5位");
+        stopBit.add("2位");
         stopBit.setFont(font);
         stopBit.setForeground(Color.black);
         add(stopBit);
 
         linkedMethod.setBounds(150, 303, 225, 40);
-        linkedMethod.add("0x00");
-        linkedMethod.add("0x01");
+        linkedMethod.add("485");
+        linkedMethod.add("422");
         linkedMethod.setFont(font);
         linkedMethod.setForeground(Color.black);
         add(linkedMethod);
@@ -441,6 +431,15 @@ public class DataView extends Frame {
 
         }
 
+    }
+
+    private void setSelect(EquipmentVO vo) {
+        baudRate.select(vo.getBaudRate());
+        equipmentLength.select(EqMaps.EQUIPMENT_LENGTH_MAP.get(vo.getEquipmentLength()));
+        parityBit.select(EqMaps.PARITY_BIT_MAP.get(vo.getParityBit()));
+        stopBit.select(EqMaps.STOP_BIT_MAP.get(vo.getStopBit()));
+        linkedMethod.select(EqMaps.LINKED_METHOD_MAP.get(vo.getLinkedMethod()));
+        plcChannelId = vo.getChannelId();
     }
 
 }
