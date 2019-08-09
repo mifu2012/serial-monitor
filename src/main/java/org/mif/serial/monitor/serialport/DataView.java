@@ -169,12 +169,7 @@ public class DataView extends Frame {
                     EquipmentVO equipmentVO = pclList.get(i);
                     plcChoice.add(equipmentVO.getEquipmentNo());
                     if (i == 0) {
-                        baudRate.select(equipmentVO.getBaudRate());
-                        equipmentLength.select(equipmentVO.getEquipmentLength());
-                        parityBit.select(equipmentVO.getParityBit());
-                        stopBit.select(equipmentVO.getStopBit());
-                        linkedMethod.select(equipmentVO.getLinkedMethod());
-                        plcChannelId = equipmentVO.getChannelId();
+                        setSelect(equipmentVO);
                     }
                 }
 
